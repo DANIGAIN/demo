@@ -76,8 +76,29 @@ const updateUserSchema = z.object({
     address: z.string().optional(),
 })
 
+const sendOptSchema = z.object({
+    action: z
+         .string({required_error:"action is required"})
+         .min(1, { message: "Action should be at min 1 character"})
+         .max(255, { message: "Action should be at min 1 character" }),
+    email: z
+         .string({ required_error: "Email is required" })
+         .min(1, { message: "Email should be at min 1 character" })
+         .email({ message: "This is a email field" }),
+});
+const verifyOptSchema = z.object({
+    otp: z
+         .string({required_error:"Otp is required"}),
+    email: z
+         .string({ required_error: "Email is required" })
+         .min(1, { message: "Email should be at min 1 character" })
+         .email({ message: "This is a email field" }),
+})
+
 export {
     registerUserSchema,
     loginUserSchema,
-    updateUserSchema
+    updateUserSchema,
+    sendOptSchema,
+    verifyOptSchema
 }; 

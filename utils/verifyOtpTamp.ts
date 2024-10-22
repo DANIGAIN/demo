@@ -1,10 +1,9 @@
-export const  VerifyTamp = (name , otp , time) => {
+export const  VerifyTamp = (name , otp ) => {
     return (
         `<div>
             <p>Hello ${ name } </p> 
             <p> Please  collect your otp for forget password </p>
             <p> OTP : ${otp} </p>
-            <p> Expiry time :  ${ time } </p>
         </div>`
     )
 }

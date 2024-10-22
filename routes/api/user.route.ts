@@ -7,13 +7,14 @@ import {
     userPasswordUpdate,
     userDeleteByAdmin,
     userProfileUpdate,
-    userForgetPasswordByOtp,
-    userForgetPasswordUseNewPassword
+    userForgetPasswordByOtp
  } from "../../controllers/auth.controller";
 import {
      loginUserSchema,
      registerUserSchema, 
-     updateUserSchema
+     sendOptSchema, 
+     updateUserSchema,
+     verifyOptSchema
 } from "../../validators/user.validator";
 import validate from "../../middlewares/validate.middleware";
 import { isAdmin, isAuthenticated } from "../../middlewares/auth.middleware";
@@ -27,9 +28,7 @@ userRoutes.get('/profile', isAuthenticated , userProfile);
 userRoutes.post('/password-update/by-token', isAuthenticated, userPasswordUpdate);
 userRoutes.delete('/delete-by-admin', isAdmin , userDeleteByAdmin);
 userRoutes.put('/profile-update', isAuthenticated , validate(updateUserSchema) ,userProfileUpdate);
-userRoutes.post('/forget-password', userForgetPassword);
-userRoutes.post('/forget-password/otp', userForgetPasswordByOtp);
-userRoutes.post('/forget-password/password', userForgetPasswordUseNewPassword);
-
+userRoutes.post('/forget-password', validate(sendOptSchema), userForgetPassword);
+userRoutes.post('/forget-password/otp', validate(verifyOptSchema), userForgetPasswordByOtp);
 
 export default userRoutes;

@@ -5,6 +5,7 @@ import uploadImage from '../utils/upload';
 import deleteImageFiles from '../utils/deleteImageFiles';
 import { sendEmail } from '../utils/sendEmail';
 import { GenerateOTP, VerifyTamp } from '../utils/verifyOtpTamp';
+import Otp from '../models/otp.model';
 
 export const userRegistration = async (req, res) => {
     const { email, name } = req.body;
@@ -305,24 +306,29 @@ export const userForgetPassword = async (req, res) => {
                     msg: 'User can not exist'
                 })
             }
-            const otp = await GenerateOTP(5);
-            const expiry = Date.now() + 5 * 60 * 1000 ;
-            await sendEmail(user.email , 'varify' , 'Otp for demo application' , VerifyTamp(user.name, otp, new Date(expiry).toLocaleTimeString()))
+            const otp:String = await GenerateOTP(5);
+            // const expiry = Date.now() + 5 * 60 * 1000 ;
+            const findOtp = await Otp.findOne({
+                email:body.email,
+                action:body.action,
+            })
+            if(!!findOtp){
+                return res.status(400).send({
+                    error:true,
+                    mgs:"Verification code alrady send . Try again later"
+                }) 
+            }
 
-            await User.findByIdAndUpdate(user._id , {
-                $set:{
-                    forgetTokenExpiry:expiry,
-                    forgetToken:otp
-                }
-            },{new:true});
-
+            await sendEmail(user.email , 'varify' , 'Otp for demo application' , VerifyTamp(user.name, otp))
+            await Otp.create({
+                email:body.email,
+                action:body.action,
+                otp:otp
+            });
             return res.status(200).send({
                 error: false,
-                msg: "Please check your email address .. verify your otp",
-                data: {
-                     email:body?.email,
-                     link:`/api/va/user/forget-password/otp`
-                }
+                msg: 'OTP sent successfully',
+                data: otp,
             })
         }else{
             return res.status(400).send({
@@ -333,6 +339,7 @@ export const userForgetPassword = async (req, res) => {
         }
 
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             error: true,
             msg: 'Internal server error'
@@ -344,29 +351,27 @@ export const userForgetPassword = async (req, res) => {
 export const  userForgetPasswordByOtp = async(req, res) =>{
     try {
         let body = req.body;
-        if(!!body?.otp && !!body?.email){
-            const user = await User.findOne({email:body.email});
-            if(!user){
+            const otp = await Otp.findOne({email:body.email});
+            if(!otp){
                 return res.status(400).send({
                     error: true,
-                    msg: 'User can not exist'
+                    msg: 'Otp can not exist'
                 })
             }
-            
-            if(user.forgetTokenExpiry.getTime() >= Date.now() && body.otp.toString() == user.forgetToken){
-                await User.findByIdAndUpdate(user._id , {
-                    $set:{
-                        forgetTokenExpiry: Date.now(),
-                        forgetToken:'accepted'
-                    }
-                },{new:true});
-                return res.status(200).send({
-                    error: false,
-                    msg: "Enter your new password",
-                    data: {
-                         email:body?.email,
-                         link:`/api/va/user/forget-password/password`
-                    }
+
+            const comTime = new Date(otp.createdAt).getDate() *2 * 60 * 1000 >= new Date(otp.createdAt).getDate(); 
+
+            if(otp.email == body.email  && otp.otp == body.otp  && comTime){
+                const user = await User.findOne({email :body.email});
+                jwt.sign({ _id: user?._id, name: user.name, role: user.role }, process.env.SECRET, {}, (error, token) => {
+                    if (error) throw error;
+                    return res.cookie('token', token, {
+                        expires: new Date(Date.now() + 2589200000),
+                        httpOnly: true,
+                    }).status(200).json({
+                        message: "Enter your new password",
+                        error: false,
+                    });;
                 })
             }else{
                 return res.status(422).send({
@@ -376,13 +381,6 @@ export const  userForgetPasswordByOtp = async(req, res) =>{
                 })
 
             }
-        }else{
-            return res.status(400).send({
-                error: true,
-                msg: 'Email and Opt are required'
-            })
-
-        }
 
     } catch (error) {
         return res.status(500).send({
@@ -391,53 +389,4 @@ export const  userForgetPasswordByOtp = async(req, res) =>{
 
         })
     }
-}
-
-export const userForgetPasswordUseNewPassword = async(req, res) =>{
-      try{
-
-        let body = req.body;
-        if(!!body?.password && !!body?.email){
-            const user = await User.findOne({email:body.email});
-            if(!user){
-                return res.status(400).send({
-                    error: true,
-                    msg: 'User can not exist'
-                })
-            }
-            
-            if(user.forgetToken === 'accepted'){
-                await User.findByIdAndUpdate(user._id , {
-                    $set:{
-                        forgetToken:'',
-                        password: await hashPassword(body.password),
-                    }
-                },{new:true});
-                return res.status(200).send({
-                    error: false,
-                    msg: "Your password successfully updated",
-                })
-            }else{
-                return res.status(422).send({
-                    error: true,
-                    msg: "invalid credentials",
-                  
-                })
-
-            }
-        }else{
-            return res.status(400).send({
-                error: true,
-                msg: 'Email and password are required'
-            })
-
-        }
-
-      }catch(error){
-        return res.status(500).send({
-            error: true,
-            msg: 'Internal server error'
-
-        })
-      }
 }

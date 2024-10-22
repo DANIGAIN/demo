@@ -29,12 +29,6 @@ const schema = new Schema({
     dateOfBirth:{
         type:Date,
     },
-    forgetToken: {    
-        type: String
-    },
-    forgetTokenExpiry: { 
-        type: Date
-    },
 },{timestamps:true});
 
 const User = model('user', schema);
