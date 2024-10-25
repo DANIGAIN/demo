@@ -7,7 +7,7 @@ import {
     userPasswordUpdate,
     userDeleteByAdmin,
     userProfileUpdate,
-    userForgetPasswordByOtp
+    userForgetPasswordByOtp,
  } from "../../controllers/auth.controller";
 import {
      loginUserSchema,

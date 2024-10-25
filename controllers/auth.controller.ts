@@ -120,16 +120,8 @@ export const userLogin = async (req, res) => {
 }
 export const userProfile = async (req, res) => {
     try {
-        const token = req.headers.cookie.substring(6);
-        if(token){
-            let decode = jwt.verify(token, process.env.SECRET) as JwtPayload;
-            if(!decode){
-                return res.status(401).json({
-                    mgs:"Unauthorized",
-                    error:true
-                })
-            }           
-            const user = await User.findById(decode._id).select('-__v -password');
+        if(!!res.locals?.user){
+            const user = await User.findById(res.locals.user._id).select('-__v -password');
             return res.status(200).json({
                 mgs:"User get successfully",
                 data:user,
@@ -347,7 +339,6 @@ export const userForgetPassword = async (req, res) => {
         })
     }
 }
-
 export const  userForgetPasswordByOtp = async(req, res) =>{
     try {
         let body = req.body;

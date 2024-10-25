@@ -5,6 +5,7 @@ const isAuthenticated = (req, res, next) =>{
     const token = req.headers.cookie.substring(6);
     if(token){
         const decode = jwt.verify(token, process.env.SECRET) as JwtPayload;
+        res.locals.user = decode;
         if(!decode){
             return res.status(401).json({
                 mgs:"Unauthorize",
