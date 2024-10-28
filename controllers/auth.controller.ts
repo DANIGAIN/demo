@@ -420,22 +420,14 @@ export const getAllUser = async (req, res) => {
         const { query } = req;
         const filter = {};
         if (!!query?.name) filter["name"] = query.name as string ;
-        if (!!query?.email) filter["email"] = query.email as string ;
+        if (!!query?.email) filter["email"] = query.email as string;
         if (!!query?.phone) filter["phone"] = query.phone as string;
         if (!!query?.role && ['user', 'admin'].includes(query?.role)) {
             filter["role"] = query.role as string;
         }
-        // if (!!query?.address) {
-        //     filter["$or"] = [
-        //         { city: query?.address.city },
-        //         { country: query?.address.country }
-        //     ]
-        // }
+        if (!!query?.city) filter["address.city"] = query.city as string ;       
+        if(!!query?.country) filter["address.country"] = query.country as string ;  
 
-        // console.log(query);
-
-        
-        // if (!!query?.dateOfBirth) filter["dateOfBirth"] = Date.parse(query.dateOfBirth);
 
         const users = await User.aggregatePaginate(
             [
