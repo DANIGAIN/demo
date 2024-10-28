@@ -16,7 +16,7 @@ const registerUserSchema = z.object({
     role: z.enum(["admin", "user"]).optional(),
     phone: z
         .string()
-        .max(11, { message: "Phone number should be at max 255 character" })
+        .max(11, { message: "Phone number should be at max 11 character" })
         .optional(),
     image: z
         .string()
@@ -67,7 +67,7 @@ const updateUserSchema = z.object({
     role: z.enum(["admin", "user"]).optional(),
     phone: z
         .string()
-        .max(11, { message: "Phone number should be at max 255 character" })
+        .max(11, { message: "Phone number should be at max 11 character" })
         .optional(),
     image: z
         .string()

@@ -1,5 +1,6 @@
 import express, {Application, Request, Response, ErrorRequestHandler  } from "express";
 import dotenv from "dotenv";
+import path from "node:path";
 import mongoose from "mongoose";
 import seedAdmin from "./utils/seeder";
 import cors from 'cors';
@@ -34,6 +35,7 @@ app.use(function (req, res, next) {
     next()
 });
 
+app.use('/public',express.static(path.join(__dirname, 'public')));
 app.use(fileUpload({
     limits: {fileSize: 50 * 1024 * 1024},
 }));

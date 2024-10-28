@@ -1,6 +1,13 @@
-import {model , Schema} from 'mongoose';
+import {model , Schema , Document} from 'mongoose';
 
-let schema = new Schema({
+interface IOtp extends Document{
+    action:string,
+    email:string,
+    otp:string,
+    expireAt:Date,
+}
+
+let schema = new Schema<IOtp>({
     action:{
         type:String,
         required:true,
@@ -17,5 +24,5 @@ let schema = new Schema({
     }
 },{timestamps:true});
 
-const Otp = model('otp', schema);
+const Otp = model<IOtp>('otp', schema);
 export default Otp ;

@@ -13,7 +13,7 @@ const  uploadImage = (email, file) =>{
     const imageFile = filename + fileExt ;
 
     const filePath = path.join(uploadDir, imageFile);
-    const fileUploadPath = './' + filePath.substring(filePath.indexOf("public")); 
+    const fileUploadPath = '/' + filePath.substring(filePath.indexOf("public")); 
     fs.writeFile(filePath, file.image.data, (error) => {
       if(error) {
         logError(error);

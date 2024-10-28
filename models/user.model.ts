@@ -1,6 +1,23 @@
-import {model , Schema} from 'mongoose';
+import {model , Schema , Document } from 'mongoose';
+import { aggregatePaginate } from '../utils/mongoose';
 
-const schema = new Schema({
+interface IUser extends Document {
+    name: string,
+    email: string,
+    phone: string,
+    password:string,
+    role:string,
+    image:string,
+    address: {
+        city: string;
+        country: string;
+    };
+    dateOfBirth:Date
+    createdAt: Date,
+    updatedAt: Date,
+}
+
+const schema = new Schema<IUser>({
     name:{
         type:String,
         required:true,
@@ -31,6 +48,9 @@ const schema = new Schema({
     },
 },{timestamps:true});
 
-const User = model('user', schema);
+schema.plugin(aggregatePaginate);
+
+
+const User = model<IUser >('User', schema);
 
 export default User ;
