@@ -51,4 +51,4 @@ app.use(errorHandler as ErrorRequestHandler);
              
 app.listen(PORT, () => {
   console.log(`[server]: Server is running at http://localhost:${PORT}`);
-});  
+});                          

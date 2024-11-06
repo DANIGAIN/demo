@@ -11,9 +11,7 @@ const deleteImageFiles = (image, email) =>{
         }
     }catch(error){
         throw error ;
-    }      
-   
-
+    }        
 } 
 
 export default deleteImageFiles ;
